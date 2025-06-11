@@ -451,8 +451,8 @@ const Spreadsheet = () => {
           ))}
         </tbody>
       </table>
-      <button className="add-row-button" onClick={handleCreateAiColumn}>Create AI Column</button>
       <button className="add-row-button" onClick={handleAddRow}>+ New Row</button>
+      <button className="add-row-button" onClick={handleCreateAiColumn}>Create AI Column</button>
 
       {contextMenu.visible && (
         <div
