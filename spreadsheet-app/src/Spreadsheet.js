@@ -48,6 +48,80 @@ const Spreadsheet = () => {
     );
   };
 
+  const handleCreateAiColumn = async () => {
+    if (data.length === 0) {
+      alert("Cannot create AI column with an empty table.");
+      return;
+    }
+
+    // 1. Prepare table_data
+    const table_data_for_api = data.map(row => {
+      const apiRow = { id: row.id }; 
+      columns.forEach(col => {
+        if (row.hasOwnProperty(col.key)) {
+          apiRow[col.header] = row[col.key];
+        } else {
+          apiRow[col.header] = ''; 
+        }
+      });
+      return apiRow;
+    });
+
+    // 2. Define request body
+    const requestBody = {
+      table_data: table_data_for_api,
+      target_column: "Major", 
+      prompt_template: "Classify the following university major as 'Engineer' or 'Non-Engineer': {major_value}. Respond with only 'Engineer' or 'Non-Engineer'.",
+      new_column_name: "Engineering Classificatiion"
+    };
+
+    try {
+      // 3. Make API call
+      const response = await fetch("http://localhost:8000/llm-complete", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("AI server error:", response.status, errorText);
+        alert(`Error from AI server: ${response.status}\n${errorText}`);
+        return;
+      }
+
+      const responseData = await response.json();
+      
+      const aiNewColumnName = responseData.new_column_name;
+      const aiNewColumnValues = responseData.column_values;
+
+      if (!aiNewColumnName || typeof aiNewColumnName !== 'string' || !Array.isArray(aiNewColumnValues) || aiNewColumnValues.length !== data.length) {
+        console.error("Invalid response from AI server. Expected { new_column_name: string, column_values: array } with matching length.", responseData);
+        alert("Received invalid or incomplete data from AI server. Check console for details.");
+        return;
+      }
+
+      // 4. Update spreadsheet state
+      const newKey = `${aiNewColumnName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
+      const newColumnDefinition = { key: newKey, header: aiNewColumnName, type: 'text' };
+
+      setColumns(prevColumns => [...prevColumns, newColumnDefinition]);
+      setData(prevData =>
+        prevData.map((row, index) => ({
+          ...row,
+          [newKey]: aiNewColumnValues[index] !== undefined ? aiNewColumnValues[index] : '',
+        }))
+      );
+      console.log("AI Column created successfully:", aiNewColumnName);
+
+    } catch (error) {
+      console.error("Failed to create AI column due to network or other error:", error);
+      alert(`Failed to communicate with AI server: ${error.message}`);
+    }
+  };
+
   // --- Row Management ---
   const handleAddRow = () => {
     const newRow = { id: nextRowId };
@@ -190,7 +264,7 @@ const Spreadsheet = () => {
       box-sizing: border-box;
     }
     .spreadsheet-container thead th {
-      background-color: #f8f9fa;
+      background-color: #eef1f5; /* Lighter, friendlier header background */
       font-weight: bold;
       position: sticky;
       top: 0;
@@ -231,7 +305,7 @@ const Spreadsheet = () => {
       display: flex;
       align-items: center;
       justify-content: space-between; /* Pushes icon to the right */
-      padding: 8px 10px; /* Add padding back for non-input display */
+      padding: 6px 8px; /* Reduced padding for a smaller header */
       cursor: text;
     }
     .spreadsheet-container .col-type-icon {
@@ -276,7 +350,12 @@ const Spreadsheet = () => {
     }
     .spreadsheet-container .add-row-button {
       margin-top: 15px;
-      display: inline-block;
+      margin-right: 10px; /* Added for spacing between buttons */
+      display: inline-block; 
+    }
+    /* Remove margin from the last button of this type if they are direct children of .spreadsheet-container */
+    .spreadsheet-container > button.add-row-button:last-of-type {
+        margin-right: 0;
     }
     .spreadsheet-container tbody tr:hover td.data-cell {
       background-color: #f0f4f8; /* Light blue hover */
@@ -372,6 +451,7 @@ const Spreadsheet = () => {
           ))}
         </tbody>
       </table>
+      <button className="add-row-button" onClick={handleCreateAiColumn}>Create AI Column</button>
       <button className="add-row-button" onClick={handleAddRow}>+ New Row</button>
 
       {contextMenu.visible && (

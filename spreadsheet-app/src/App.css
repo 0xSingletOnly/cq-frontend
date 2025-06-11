@@ -14,14 +14,42 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  padding: 20px 0; /* Adjusted from min-height: 100vh */
+  background-color: #eef1f5; /* Same grey as spreadsheet column headers */
+  padding: 8px 20px; /* Reduced padding for a smaller header */
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  flex-direction: row; /* Align items in a row */
+  align-items: center; /* Vertically center items in the row */
+  justify-content: flex-start; /* Align items to the left */
+  color: #333;
+  border-bottom: 1px solid #ddd; /* Subtle border like Google Sheets */
+}
+
+.app-title-display {
+  cursor: text;
+  margin: 0;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 1.1em; /* Smaller, discrete font size */
+  font-weight: 500; /* Slightly bolder than normal, but not full bold */
+  color: #333;
+}
+
+.app-title-display:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.app-title-input {
+  font-size: 1.1em; /* Match display style */
+  font-weight: 500; /* Match display style */
+  color: #333;
+  background-color: white;
+  border: 1px solid #007bff; /* Subtle border for editing */
+  border-radius: 3px;
+  padding: 4px 8px;
+  text-align: left;
+  outline: none;
+  box-sizing: border-box;
+  min-width: 200px; /* Adjusted min-width */
 }
 
 .App-link {
