@@ -1,0 +1,47 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px 0; /* Adjusted from min-height: 100vh */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spreadsheet-container {
+  height: 70vh; /* Changed from 10vh to make it more usable, can be adjusted */
+  width: 90%;
+  margin: 20px auto;
+  overflow: auto; /* Important for scrolling within the container */
+  border: 1px solid #ccc; /* To visualize the container boundaries */
+  background-color: #f9f9f9; /* Light background for the spreadsheet area */
+}
